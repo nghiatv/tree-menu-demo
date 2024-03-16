@@ -1,7 +1,5 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { rootData } from "@/constants/tree";
 import Tree from "./tree";
 
