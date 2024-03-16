@@ -1,15 +1,29 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 
-type Node = {
+type Entry = {
   id: string;
   value: string;
-  children?: Node[];
+  parentId: string;
 };
 
 type State = {
-  tree: Node[];
+  entries: Entry[];
 };
+
+type Node = {
+  id: string;
+  value: string;
+  children: Node[];
+};
+
+const initialEntries: Entry[] = Array.from({ length: 100 }, (_, index) => {
+  const id = (index + 1).toString();
+  const value = `Node ${id}`;
+  const parentId = index > 0 ? (((index - 1) / 2) >> 0).toString() : ""; // Each node has its parent as the half of its index (integer division), except for the root node
+
+  return { id, value, parentId };
+});
 
 type Actions = {
   addNode: (parentId: string, value: string) => void;
@@ -18,52 +32,43 @@ type Actions = {
 };
 
 const useTreeStore = create<State & Actions>((set) => ({
-  tree: [],
+  entries: initialEntries,
   addNode: (parentId, value: string) =>
     set((state) => {
-      const newTree = state.tree.map((node) => {
-        if (node.id === parentId) {
-          return {
-            ...node,
-            children: [
-              ...(node.children || []),
-              {
-                id: uuidv4(),
-                value,
-              },
-            ],
-          };
-        }
-        return node;
-      });
-      return { tree: newTree };
+      const newNode = {
+        id: uuidv4(),
+        value,
+        parentId,
+      };
+      return { entries: [...state.entries, newNode] };
     }),
   removeNode: (id) =>
     set((state) => {
-      const newTree = state.tree.map((node) => {
-        if (node.id === id) {
-          return {
-            ...node,
-            children: undefined,
-          };
-        }
-        return node;
-      });
-      return { tree: newTree };
+      const newTree = state.entries.filter((node) => node.id !== id);
+      return { entries: newTree };
     }),
   updateNode: (id, value) =>
     set((state) => {
-      const newTree = state.tree.map((node) => {
-        if (node.id === id) {
-          return {
-            ...node,
-            value,
-          };
-        }
-        return node;
-      });
-      return { tree: newTree };
+      const newTree = state.entries.map((node) =>
+        node.id === id ? { ...node, value } : node
+      );
+      return { entries: newTree };
     }),
 }));
 
+export const useTree = () => {
+  // build a tree from the flat list of nodes
+  const tree = useTreeStore((state) => {
+    const root = state.entries.find((node) => !node.parentId);
+    if (!root) return null;
+    const buildTree: any = (node: Entry) => ({
+      ...node,
+      children: state.entries
+        .filter((n) => n.parentId === node.id)
+        .map(buildTree),
+    });
+    return buildTree(root);
+  });
+  return tree;
+};
 export default useTreeStore;

@@ -1,13 +1,16 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { rootData } from "@/constants/tree";
 import Tree from "./tree";
+import { useTree } from "@/stores/tree";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   playlists: any[];
 }
 
 export function Sidebar({ className }: SidebarProps) {
+  const rootData = useTree();
+
+  console.log(rootData);
   return (
     <div className={cn("pb-12 min-h-screen", className)}>
       <div className="space-y-4 py-4">
