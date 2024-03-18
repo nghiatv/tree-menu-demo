@@ -3,14 +3,11 @@ import { cn } from "@/lib/utils";
 import Tree from "./tree";
 import { useTree } from "@/stores/tree";
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-  playlists: any[];
-}
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
   const rootData = useTree();
 
-  console.log(rootData);
   return (
     <div className={cn("pb-12 min-h-screen", className)}>
       <div className="space-y-4 py-4">

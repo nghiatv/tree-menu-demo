@@ -1,14 +1,13 @@
 import { FC } from "react";
-import { TreeNode, TreeNodeProps } from "./Node";
+import { TreeNode } from "./Node";
+import { Node } from "@/stores/tree";
 
 type TreeProps = {
-  root: TreeNodeProps;
+  root: Node | null;
 };
 
 const Tree: FC<TreeProps> = ({ root }) => (
-  <ul className="pl-4">
-    <TreeNode {...root} />
-  </ul>
+  <ul className="pl-4">{root && <TreeNode {...root} />}</ul>
 );
 
 export default Tree;

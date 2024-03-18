@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { CreateNodeDialog } from "@/components/app/dialogs/CreateNode";
+import { ConfirmationDialog } from "@/components/app/dialogs/Confirmation";
+import { UpdateNodeDialog } from "@/components/app/dialogs/UpdateNode";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -28,6 +31,9 @@ export default function RootLayout({
         )}
       >
         {children}
+        <CreateNodeDialog />
+        <ConfirmationDialog />
+        <UpdateNodeDialog />
       </body>
     </html>
   );

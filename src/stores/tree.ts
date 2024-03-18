@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 
-type Entry = {
+export type Entry = {
   id: string;
   value: string;
   parentId: string;
@@ -11,9 +11,7 @@ type State = {
   entries: Entry[];
 };
 
-type Node = {
-  id: string;
-  value: string;
+export type Node = Entry & {
   children: Node[];
 };
 
@@ -31,6 +29,11 @@ type Actions = {
   updateNode: (id: string, value: string) => void;
 };
 
+/**
+ * Custom hook for managing a tree store.
+ *
+ * @returns An object containing the state and actions for the tree store.
+ */
 const useTreeStore = create<State & Actions>((set) => ({
   entries: initialEntries,
   addNode: (parentId, value: string) =>
@@ -61,10 +64,10 @@ export const useTree = () => {
   const tree = useTreeStore((state) => {
     const root = state.entries.find((node) => !node.parentId);
     if (!root) return null;
-    const buildTree: any = (node: Entry) => ({
-      ...node,
+    const buildTree = (entry: Entry): Node => ({
+      ...entry,
       children: state.entries
-        .filter((n) => n.parentId === node.id)
+        .filter((n) => n.parentId === entry.id)
         .map(buildTree),
     });
     return buildTree(root);
