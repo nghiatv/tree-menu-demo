@@ -15,7 +15,7 @@ export type Node = Entry & {
   children: Node[];
 };
 
-const initialEntries: Entry[] = Array.from({ length: 100 }, (_, index) => {
+const initialEntries: Entry[] = Array.from({ length: 30 }, (_, index) => {
   const id = (index + 1).toString();
   const value = `Node ${id}`;
   const parentId = index > 0 ? (((index - 1) / 2) >> 0).toString() : ""; // Each node has its parent as the half of its index (integer division), except for the root node
@@ -34,20 +34,21 @@ type Actions = {
  *
  * @returns An object containing the state and actions for the tree store.
  */
-const useTreeStore = create<State & Actions>((set) => ({
+const useTreeStore = create<State & Actions>((set, get) => ({
   entries: initialEntries,
-  addNode: (parentId, value: string) =>
+  addNode: (parentId, value: string) => {
+    const id = uuidv4();
     set((state) => {
-      const newNode = {
-        id: uuidv4(),
-        value,
-        parentId,
-      };
-      return { entries: [...state.entries, newNode] };
-    }),
+      const newEntry = { id, value, parentId };
+      return { entries: [...state.entries, newEntry] };
+    });
+    return id;
+  },
   removeNode: (id) =>
     set((state) => {
-      const newTree = state.entries.filter((node) => node.id !== id);
+      const newTree = state.entries
+        .filter((node) => node.id !== id) // Remove the node
+        .filter((node) => node.parentId !== id); // Remove all children of the node as well
       return { entries: newTree };
     }),
   updateNode: (id, value) =>

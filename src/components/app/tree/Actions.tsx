@@ -10,10 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreVertical, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useCreateNodeStore } from "@/stores/createNode";
-import useTreeStore from "@/stores/tree";
+import useTreeStore, { useTree } from "@/stores/tree";
 import { confrimationDialogRef } from "../dialogs/Confirmation";
 import { useUpdateNodeStore } from "@/stores/updateNode";
 import { Node } from "@/stores/tree";
+import { findSibling, findNode, findPathToNode } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 type ActionsProps = {
   node: Node;
@@ -22,7 +24,9 @@ type ActionsProps = {
 export function Actions({ node }: ActionsProps) {
   const { openDialog } = useCreateNodeStore();
   const { openUpdateDialog } = useUpdateNodeStore();
-  const { removeNode, updateNode } = useTreeStore();
+  const { removeNode } = useTreeStore();
+  const tree = useTree();
+  const router = useRouter();
 
   const handleAddNewNode = () => {
     if (node.id) {
@@ -37,9 +41,25 @@ export function Actions({ node }: ActionsProps) {
   };
 
   const handleRemoveNode = async () => {
+    const path = findPathToNode(tree, node.id);
+
+    console.log({ path });
+
     const confirmed = await confrimationDialogRef.current?.show();
+
     if (confirmed) {
+      const parentNode = findNode(tree, node.parentId);
+
+      const sibling = findSibling(parentNode, node.id);
+
       removeNode(node.id);
+      // If the node has a sibling, navigate to the sibling
+      if (sibling) {
+        router.push(`/${sibling.id}`);
+      } else {
+        // If the node does not have a sibling, navigate to the parent
+        router.push("/");
+      }
     }
   };
 

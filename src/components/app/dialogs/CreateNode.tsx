@@ -12,17 +12,20 @@ import { Label } from "@/components/ui/label";
 import { useCreateNodeStore } from "@/stores/createNode";
 import useTreeStore from "@/stores/tree";
 import { SendIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function CreateNodeDialog() {
   const { open, setOpen, parentId } = useCreateNodeStore();
   const { addNode } = useTreeStore();
+  const router = useRouter();
   const [value, setValue] = useState<string>("");
 
   const handleCreateNode = () => {
     try {
       if (parentId) {
-        addNode(parentId, value);
+        const newNodeId = addNode(parentId, value);
+        router.push(`/${newNodeId}`);
       }
       setOpen(false);
       setValue("");

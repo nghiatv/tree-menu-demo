@@ -1,4 +1,6 @@
-import { FC, useState } from "react";
+"use client";
+
+import { FC, use, useEffect, useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -6,11 +8,17 @@ import {
 } from "@/components/ui/collapsible";
 import { MinusCircleIcon, PlusCircleIcon } from "lucide-react";
 import { Actions } from "./Actions";
-import { Node } from "@/stores/tree";
+import { Node, useTree } from "@/stores/tree";
+import Link from "next/link";
+
+import { usePathname } from "next/navigation";
+import { cn, findPathToNode } from "@/lib/utils";
 
 export const TreeNode: FC<Node> = (props) => {
   const { id, value, children } = props;
+  const pathname = usePathname();
   const [open, setOpen] = useState(true);
+
   return (
     <Collapsible key={`node-${id}`} asChild open={open} onOpenChange={setOpen}>
       <li className=" relative before:border-l before:pr-2 before:h-full before:block before:absolute before:left-0 py-1 pl-2">
@@ -25,7 +33,15 @@ export const TreeNode: FC<Node> = (props) => {
                 )}
               </>
             </CollapsibleTrigger>
-            <span className="text-sm">{value}</span>
+            <Link
+              href={`/${id}`}
+              className={cn(
+                "whitespace-nowrap",
+                pathname === `/${id}` ? "font-semibold underline" : ""
+              )}
+            >
+              <span className="text-sm">{value}</span>
+            </Link>
           </div>
           <Actions node={props} />
         </div>
