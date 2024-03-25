@@ -15,7 +15,8 @@ import { confrimationDialogRef } from "../dialogs/Confirmation";
 import { useUpdateNodeStore } from "@/stores/updateNode";
 import { Node } from "@/stores/tree";
 import { findSibling, findNode, findPathToNode } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useMemo } from "react";
 
 type ActionsProps = {
   node: Node;
@@ -27,6 +28,7 @@ export function Actions({ node }: ActionsProps) {
   const { removeNode } = useTreeStore();
   const tree = useTree();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleAddNewNode = () => {
     if (node.id) {
@@ -40,19 +42,26 @@ export function Actions({ node }: ActionsProps) {
     }
   };
 
-  const handleRemoveNode = async () => {
+  const handleRemoveNode = useCallback(async () => {
     const path = findPathToNode(tree, node.id);
-
-    console.log({ path });
 
     const confirmed = await confrimationDialogRef.current?.show();
 
     if (confirmed) {
+      // find parent node
       const parentNode = findNode(tree, node.parentId);
 
+      // find the sibling of the node
       const sibling = findSibling(parentNode, node.id);
 
+      // Remove the node from the tree
       removeNode(node.id);
+
+      // If the current pathname is not the node's pathname, do nothing
+      if (pathname !== `/${node.id}`) {
+        return;
+      }
+
       // If the node has a sibling, navigate to the sibling
       if (sibling) {
         router.push(`/${sibling.id}`);
@@ -61,7 +70,7 @@ export function Actions({ node }: ActionsProps) {
         router.push("/");
       }
     }
-  };
+  }, [tree, node.id, node.parentId, removeNode, pathname, router]);
 
   return (
     <DropdownMenu>
