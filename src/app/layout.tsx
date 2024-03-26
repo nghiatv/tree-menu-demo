@@ -7,6 +7,7 @@ import { CreateNodeDialog } from "@/components/app/dialogs/CreateNode";
 import { ConfirmationDialog } from "@/components/app/dialogs/Confirmation";
 import { UpdateNodeDialog } from "@/components/app/dialogs/UpdateNode";
 import { Sidebar } from "@/components/app/Sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -32,12 +33,14 @@ export default function RootLayout({
         )}
       >
         <main>
-          <div className="grid sm:grid-cols-3 lg:grid-cols-4">
-            <Sidebar className="hidden sm:block" />
-            <div className="col-span-3 sm:col-span-2 sm:border-l lg:col-span-3">
-              {children}
+          <TooltipProvider>
+            <div className="grid sm:grid-cols-3 lg:grid-cols-4">
+              <Sidebar className="hidden sm:block" />
+              <div className="col-span-3 sm:col-span-2 sm:border-l lg:col-span-3">
+                {children}
+              </div>
             </div>
-          </div>
+          </TooltipProvider>
         </main>
         <CreateNodeDialog />
         <ConfirmationDialog />

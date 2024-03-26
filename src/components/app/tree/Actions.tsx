@@ -14,7 +14,12 @@ import useTreeStore, { useTree } from "@/stores/tree";
 import { confrimationDialogRef } from "../dialogs/Confirmation";
 import { useUpdateNodeStore } from "@/stores/updateNode";
 import { Node } from "@/stores/tree";
-import { findSibling, findNode, findPathToNode } from "@/lib/utils";
+import {
+  findSibling,
+  findNode,
+  findPathToNode,
+  isDescendantOrSelf,
+} from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
@@ -54,11 +59,17 @@ export function Actions({ node }: ActionsProps) {
       // find the sibling of the node
       const sibling = findSibling(parentNode, node.id);
 
+      const shouldRedirect = isDescendantOrSelf(
+        tree,
+        pathname.slice(1),
+        node.id
+      );
+
       // Remove the node from the tree
       removeNode(node.id);
 
       // If the current pathname is not the node's pathname, do nothing
-      if (pathname !== `/${node.id}`) {
+      if (!shouldRedirect) {
         return;
       }
 
@@ -67,7 +78,7 @@ export function Actions({ node }: ActionsProps) {
         router.push(`/${sibling.id}`);
       } else {
         // If the node does not have a sibling, navigate to the parent
-        router.push("/");
+        router.push(`/${parentNode?.id}`);
       }
     }
   }, [tree, node.id, node.parentId, removeNode, pathname, router]);
@@ -78,7 +89,7 @@ export function Actions({ node }: ActionsProps) {
         <Button
           variant="ghost"
           size="sm"
-          className="opacity-0 group-hover:opacity-100 w-5 h-5 px-0"
+          className="opacity-0 group-hover:opacity-100 w-5 h-5 px-0 outline-none focus:outline-none focus-within:ring-0"
         >
           <MoreVertical className="h-4 w-4" />
           <span className="sr-only">More</span>
@@ -92,9 +103,9 @@ export function Actions({ node }: ActionsProps) {
           <PencilIcon className="mr-2 h-4 w-4" /> Update Node
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleRemoveNode}>
-          <Trash2Icon className="mr-2 h-4 w-4 text-red-400" />{" "}
-          <span className="text-red-400">Remove Node</span>
+        <DropdownMenuItem disabled={!node.parentId} onClick={handleRemoveNode}>
+          <Trash2Icon className="mr-2 h-4 w-4 text-red-700" />{" "}
+          <span className="text-red-700 font-semibold">Remove Node</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
