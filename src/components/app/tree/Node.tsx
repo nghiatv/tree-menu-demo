@@ -26,7 +26,7 @@ export const TreeNode: FC<Node> = (props) => {
 
   return (
     <Collapsible key={`node-${id}`} asChild open={open} onOpenChange={setOpen}>
-      <li className="w-full relative before:border-l before:pr-2 before:h-full before:block before:absolute before:left-0 py-1 pl-1 overflow-x-hidden">
+      <li className="w-full relative before:border-l before:pr-2 before:h-full before:block before:absolute before:left-0 py-1 pl-1 overflow-hidden">
         <div className="flex group w-full gap-x-2">
           <CollapsibleTrigger className="cursor-pointer block">
             <>
